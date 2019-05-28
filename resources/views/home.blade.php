@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="{{asset('css/app.css')}}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Single Page Forum</title>
+    <style>
+        body {
+            position: relative;
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
+    </style>
 </head>
 <body>
     <div id="app">

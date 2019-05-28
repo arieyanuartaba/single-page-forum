@@ -10,12 +10,19 @@ window.Vue = require('vue');
 
 import Vue from 'vue';
 import Vuetify from 'vuetify';
-
 Vue.use(Vuetify);
+
+import VueSimplemde from 'vue-simplemde'
+Vue.use(VueSimplemde)
+
+import md from 'marked'
+window.md = md
 
 import User from './Helpers/User'
 window.User = User
-console.log(User.id())
+
+window.EventBus = new Vue();
+
 
 /**
  * The following block of code may be used to automatically register your

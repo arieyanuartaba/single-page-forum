@@ -6,7 +6,7 @@ class User {
         // console.log(data)
         axios.post('/api/auth/login', data)        
         .then(res => this.responseAfterLogin(res))
-        .catch(error => console.log(error.response.data))
+        .catch(error => console.log(error.response.data.errors))
     }
 
     responseAfterLogin(res) {
@@ -15,6 +15,7 @@ class User {
         
         if(Token.isValid(access_token)){
             AppStorage.store(username, access_token)
+            window.location = '/forum'
         }
     }
 
@@ -35,7 +36,8 @@ class User {
 
     logout() {
 
-        return AppStorage.clear()
+         AppStorage.clear()
+         return window.location = '/forum'
     }
 
     name() {
@@ -50,6 +52,11 @@ class User {
 
             return payload.sub
         }
+    }
+
+    own(id) {
+
+        return this.id() == id 
     }
 }
 
