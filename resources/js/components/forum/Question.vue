@@ -12,7 +12,7 @@
         <div>
             <small>  
               <v-chip label>{{data.username}} said {{data.created_at}} </v-chip> | 
-              <v-chip label outline color="red">Category</v-chip> 
+              <v-chip label outline color="red">{{data.cat_name}}</v-chip> 
             </small>
         </div>
       </div>

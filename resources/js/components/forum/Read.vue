@@ -10,7 +10,18 @@
                 :data="question"
                 v-if="question"
             />
+
+            <div>
+            <comp-replies 
+                v-if="question.replies"
+                :question="question"
+            ></comp-replies>
+            <comp-newreply
+                :questionSlug="question.slug"
+            ></comp-newreply>
+            </div>
         </div>
+
     </div>
     
 </template>
@@ -18,11 +29,13 @@
 <script>
 import compShowquestion from './ShowQuestion';
 import compEditquestion from './EditQuestion';
+import compReplies from '../reply/Replies';
+import compNewreply from '../reply/newReply';
 
 export default {
     data(){
         return{
-            question:null,
+            question:{},
             editnow: false
         }
     },
@@ -34,7 +47,9 @@ export default {
     
     components: {
         compShowquestion,
-        compEditquestion
+        compEditquestion,
+        compReplies,
+        compNewreply
     },
     methods: {
         listen(){

@@ -10,7 +10,7 @@
       </v-flex>
 
       <v-flex xs4>
-        <h1>Sidebar</h1>
+        <comp-sidebar></comp-sidebar>
       </v-flex>
     </v-layout>
   </v-container>
@@ -18,6 +18,7 @@
 
 <script>
 import compQuestion from './Question';
+import compSidebar from '../sidebar/Sidebar';
 
 export default {
     data(){
@@ -31,7 +32,8 @@ export default {
         .catch( error => console.log(error.response.data))
     },
     components: {
-        compQuestion
+        compQuestion,
+        compSidebar
     }
 }
 </script>

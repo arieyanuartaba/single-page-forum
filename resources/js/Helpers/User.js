@@ -58,6 +58,10 @@ class User {
 
         return this.id() == id 
     }
+
+    isAdmin() {
+        return this.id() == 11
+    }
 }
 
 export default User = new User();

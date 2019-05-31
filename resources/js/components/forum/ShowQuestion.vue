@@ -18,10 +18,13 @@
       </div>
        <v-spacer>           
         </v-spacer>
-         <v-btn color="teal">5 replies</v-btn>
+            <v-btn color="teal" dark>{{data.reply_count}} Replies</v-btn>
+            <router-link to="/forum">
+                <v-btn color="orange">Back</v-btn>
+            </router-link>  
     </v-card-title>
     <!-- <v-card-body color="white"> -->
-        <v-card-text class="black--text whiteCol" v-html="bodyToMark">
+        <v-card-text class="black--text whiteCol" v-html="bodyToMark" v-if="data.body">
             
         </v-card-text>  
     <!-- </v-card-body> -->
@@ -36,18 +39,14 @@
     </v-card-actions>
     
   </v-card>
-
-    <router-link to="/forum">
-        <v-btn color="orange">Back</v-btn>
-    </router-link>  
 </div>
 </template>
 
 <script>
 export default {
     data(){
-        return{
-            own: User.own(this.data.user_id)
+        return{           
+            own: User.own(this.data.user_id)            
         }
     },
     props: ['data'],
