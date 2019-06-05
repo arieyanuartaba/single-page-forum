@@ -3,6 +3,7 @@
     <!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
     <v-toolbar-title>My Forum</v-toolbar-title>
     <v-spacer></v-spacer>
+    <comp-appnotification  v-if="loggedIn"></comp-appnotification>
     <div class="hidden-sm-and-down">
       <router-link 
         v-for="item in items"
@@ -17,9 +18,11 @@
 </template>
 
 <script>
+import CompAppnotification from './AppNotification';
 export default {
   data(){
     return{
+      loggedIn: User.loggedIn(),
       items: [
         {title: 'Forum', to: '/forum', show: true},
         {title: 'Question', to: '/ask', show: User.loggedIn()},
@@ -33,6 +36,9 @@ export default {
     EventBus.$on('logout', () => {
       User.logout()
     })
+  },
+  components:{
+    CompAppnotification
   }
 }
 </script>

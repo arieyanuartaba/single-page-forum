@@ -21,15 +21,17 @@ class LikeController extends Controller
 
    public function likeIt(Reply $reply) {
 
-        // $reply->like()->created('user_id', auth()->id);
-        $reply->like()->create(['user_id' => 1]);
+        $reply->like()->create([
+             'user_id' => auth()->id()]
+          );
+     //    $reply->like()->create(['user_id' => 1]);
 
    }
 
    public function unLikeIt(Reply $reply) {
 
-        // $reply->like()->where('user_id', auth()->id)->first()->delete();
-        $reply->like()->where('user_id', 1)->first()->delete();
+        $reply->like()->where('user_id', auth()->id())->first()->delete();
+     //    $reply->like()->where('user_id', 1)->first()->delete();
 
    }
 }

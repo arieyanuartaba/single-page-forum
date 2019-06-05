@@ -6,7 +6,11 @@
             </div>
             <div class="small ml-2">
                 {{data.created_at}}
-            </div>            
+            </div>
+            <v-spacer></v-spacer>
+            <comp-like 
+            :content="data">
+            </comp-like>            
         </v-card-title>
         <v-divider></v-divider>
 
@@ -38,6 +42,7 @@
 
 <script>
 import compEditreply from '../reply/editReply';
+import compLike from '../likes/Like';
 
 export default {
     props:['data', 'index'],
@@ -72,7 +77,8 @@ export default {
         }
     },
     components:{
-        compEditreply
+        compEditreply,
+        compLike
     }
 }
 </script>
