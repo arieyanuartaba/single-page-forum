@@ -1965,6 +1965,8 @@ __webpack_require__.r(__webpack_exports__);
         _this2.read = res.data.read;
         _this2.unread = res.data.unread;
         _this2.unreadCount = res.data.unread.length;
+      })["catch"](function (error) {
+        return Exception.handle(error);
       });
     },
     readIt: function readIt(notification) {
@@ -2416,6 +2418,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -2430,6 +2439,11 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     this.listen();
     this.showQuestion();
+  },
+  computed: {
+    loggedIn: function loggedIn() {
+      return User.loggedIn();
+    }
   },
   components: {
     compShowquestion: _ShowQuestion__WEBPACK_IMPORTED_MODULE_0__["default"],
@@ -2527,19 +2541,36 @@ __webpack_require__.r(__webpack_exports__);
       return md.parse(this.data.body);
     }
   },
+  created: function created() {
+    var _this = this;
+
+    EventBus.$on('newReplyEvent', function () {
+      _this.data.reply_count++;
+    }), EventBus.$on('deleteReplyEvent', function () {
+      _this.data.reply_count--;
+    }), Echo["private"]('App.User.' + User.id()).notification(function (notification) {
+      _this.data.reply_count++;
+    });
+    Echo.channel('deleteReplyChannel').listen('DeleteReplyEvent', function (e) {
+      _this.data.reply_count--;
+    });
+  },
   methods: {
     destroy: function destroy() {
-      var _this = this;
+      var _this2 = this;
 
       console.log("/api/question/".concat(this.data.slug));
       axios["delete"]("/api/question/".concat(this.data.slug)).then(function (res) {
-        return _this.$router.push('/forum');
+        return _this2.$router.push('/forum');
       })["catch"](function (error) {
         return console.log(error.response.data);
       });
     },
     edit: function edit() {
       EventBus.$emit('sendEventEdit');
+    },
+    conso: function conso() {
+      console.log(this.data);
     }
   }
 });
@@ -68884,9 +68915,27 @@ var render = function() {
                     ? _c("comp-replies", { attrs: { question: _vm.question } })
                     : _vm._e(),
                   _vm._v(" "),
-                  _c("comp-newreply", {
-                    attrs: { questionSlug: _vm.question.slug }
-                  })
+                  _vm.loggedIn
+                    ? _c("comp-newreply", {
+                        attrs: { questionSlug: _vm.question.slug }
+                      })
+                    : _c(
+                        "div",
+                        { staticClass: "ml-3" },
+                        [
+                          _c(
+                            "router-link",
+                            { attrs: { to: "/Login" } },
+                            [
+                              _c("v-btn", { staticClass: "btn warning" }, [
+                                _vm._v("Back to Login")
+                              ])
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
                 ],
                 1
               )
@@ -68968,7 +69017,9 @@ var render = function() {
                 { attrs: { to: "/forum" } },
                 [_c("v-btn", { attrs: { color: "orange" } }, [_vm._v("Back")])],
                 1
-              )
+              ),
+              _vm._v(" "),
+              _c("v-btn", { on: { click: _vm.conso } }, [_vm._v("test")])
             ],
             1
           ),
@@ -110458,6 +110509,52 @@ function () {
 
 /***/ }),
 
+/***/ "./resources/js/Helpers/Exception.js":
+/*!*******************************************!*\
+  !*** ./resources/js/Helpers/Exception.js ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _User__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./User */ "./resources/js/Helpers/User.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var Exception =
+/*#__PURE__*/
+function () {
+  function Exception() {
+    _classCallCheck(this, Exception);
+  }
+
+  _createClass(Exception, [{
+    key: "handle",
+    value: function handle(error) {
+      this.isExpired(error.response.data.error);
+    }
+  }, {
+    key: "isExpired",
+    value: function isExpired(error) {
+      if (error == 'Token is expired' || error == 'Token is invalid') {
+        _User__WEBPACK_IMPORTED_MODULE_0__["default"].logout();
+      }
+    }
+  }]);
+
+  return Exception;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (Exception = new Exception());
+
+/***/ }),
+
 /***/ "./resources/js/Helpers/Token.js":
 /*!***************************************!*\
   !*** ./resources/js/Helpers/Token.js ***!
@@ -110501,7 +110598,20 @@ function () {
   }, {
     key: "decode",
     value: function decode(payload) {
-      return JSON.parse(atob(payload));
+      if (this.isBase64(payload)) {
+        return JSON.parse(atob(payload));
+      }
+
+      return false;
+    }
+  }, {
+    key: "isBase64",
+    value: function isBase64(str) {
+      try {
+        return btoa(atob(str)).replace(/=/g, "") == str;
+      } catch (error) {
+        return false;
+      }
     }
   }]);
 
@@ -110568,7 +110678,7 @@ function () {
       var storeToken = _AppStorage__WEBPACK_IMPORTED_MODULE_1__["default"].getToken();
 
       if (storeToken) {
-        return _Token__WEBPACK_IMPORTED_MODULE_0__["default"].isValid(storeToken) ? true : false;
+        return _Token__WEBPACK_IMPORTED_MODULE_0__["default"].isValid(storeToken) ? true : this.logout();
       }
 
       return false;
@@ -110636,7 +110746,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var marked__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! marked */ "./node_modules/marked/lib/marked.js");
 /* harmony import */ var marked__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(marked__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _Helpers_User__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Helpers/User */ "./resources/js/Helpers/User.js");
-/* harmony import */ var _components_Router_router__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/Router/router */ "./resources/js/components/Router/router.js");
+/* harmony import */ var _Helpers_Exception__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Helpers/Exception */ "./resources/js/Helpers/Exception.js");
+/* harmony import */ var _components_Router_router__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/Router/router */ "./resources/js/components/Router/router.js");
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -110654,6 +110765,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_simplemde__WEBPACK_IMPORTED_M
 window.md = marked__WEBPACK_IMPORTED_MODULE_3___default.a;
 
 window.User = _Helpers_User__WEBPACK_IMPORTED_MODULE_4__["default"];
+
+window.Exception = _Helpers_Exception__WEBPACK_IMPORTED_MODULE_5__["default"];
 window.EventBus = new vue__WEBPACK_IMPORTED_MODULE_0___default.a();
 /**
  * The following block of code may be used to automatically register your
@@ -110675,7 +110788,7 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('AppHome', __webpack_requir
 
 var app = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
   el: '#app',
-  router: _components_Router_router__WEBPACK_IMPORTED_MODULE_5__["default"]
+  router: _components_Router_router__WEBPACK_IMPORTED_MODULE_6__["default"]
 });
 
 /***/ }),

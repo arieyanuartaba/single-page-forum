@@ -16,9 +16,16 @@
                 v-if="question.replies"
                 :question="question"
             ></comp-replies>
+
             <comp-newreply
+                v-if="loggedIn"
                 :questionSlug="question.slug"
             ></comp-newreply>
+            <div v-else class="ml-3">
+                <router-link to="/Login">
+                    <v-btn class="btn warning">Back to Login</v-btn>
+                </router-link>
+            </div>
             </div>
         </div>
 
@@ -44,7 +51,11 @@ export default {
         this.listen()
         this.showQuestion()
     },
-    
+    computed:{
+        loggedIn(){
+            return User.loggedIn()
+        }
+    },
     components: {
         compShowquestion,
         compEditquestion,

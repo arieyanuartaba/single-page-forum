@@ -16,12 +16,12 @@
         </div>
        
       </div>
-       <v-spacer>           
-        </v-spacer>
+       <v-spacer></v-spacer>
             <v-btn color="teal" dark>{{data.reply_count}} Replies</v-btn>
             <router-link to="/forum">
                 <v-btn color="orange">Back</v-btn>
-            </router-link>  
+            </router-link> 
+            <v-btn @click="conso">test</v-btn> 
     </v-card-title>
     <!-- <v-card-body color="white"> -->
         <v-card-text class="black--text whiteCol" v-html="bodyToMark" v-if="data.body">
@@ -55,6 +55,25 @@ export default {
             return md.parse(this.data.body)
         }
     },
+    created(){
+        EventBus.$on('newReplyEvent', () => {
+            this.data.reply_count ++
+        }),
+
+        EventBus.$on('deleteReplyEvent', () => {
+            this.data.reply_count --
+        }),
+
+        Echo.private('App.User.' + User.id())
+            .notification((notification) => {
+                this.data.reply_count ++
+        });
+
+           Echo.channel('deleteReplyChannel')
+                .listen('DeleteReplyEvent', (e) => {
+                   this.data.reply_count --
+                })
+    },
     methods:{
         destroy(){
             console.log(`/api/question/${this.data.slug}`)
@@ -64,6 +83,9 @@ export default {
         },
         edit(){
             EventBus.$emit('sendEventEdit')
+        },
+        conso(){
+            console.log(this.data)
         }
     }
 }
